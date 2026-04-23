@@ -23,52 +23,46 @@ namespace PMS.Infrastructre.Repository
 
 
         }
-        public async ValueTask<TEntity> AddAsync(TEntity entity)
-        {
-            await _entity.AddAsync(entity);//return EntityEntry<TEntity>
-            await _context.SaveChangesAsync();
-            return entity;
-        }
+         public async Task<TEntity> AddAsync(TEntity entity)
+         {
+          await _entity.AddAsync(entity);//return EntityEntry<TEntity>
+           return entity;
+         }
 
-        public async ValueTask<bool> DeleteAsync(object id)
-        {
-            var oData = await _entity.FindAsync(id);
-            if (oData == null)
-                return false;
+         public void Delete(TEntity entity)
+         {
+        
+             _context.Remove(entity);
+        
+         }
 
-            _entity.Remove(oData);
-            SaveChanges();
-            return true;
-        }
+         public async Task<TEntity?> GetByIdAsync(int id)
+         {
+             return await _entity.FindAsync(id);
+        
+         }
 
-        public ValueTask<TEntity?> GetByIdAsync(object id)
-        {
-            return _entity.FindAsync(id);
+         public async Task<List<TEntity>> GetAllAsync()
+         {
+             return await _entity.ToListAsync();
+         }
 
 
-        }
+         public Task UpdateAsync(TEntity entity)
+         {
+             _entity.Update(entity);
+             return Task.CompletedTask;
+         }
 
-        public async ValueTask<IEnumerable<TEntity>> GetAllAsync()
-        {
-            return await _entity.ToListAsync();
-        }
+         public async Task<bool> ExistsAsync(
+                 Expression<Func<TEntity, bool>> predicate)
+         {
+             return await _entity.AnyAsync(predicate);
+         }
 
-        public async Task<bool> UpdateAsync(TEntity entity)
-        {
-            _entity.Update(entity);
-            return await _context.SaveChangesAsync() > 0;
-
-        }
-
-        public async Task<bool> ExistsAsync(
-                Expression<Func<TEntity, bool>> predicate)
-        {
-            return await _entity.AnyAsync(predicate);
-        }
-
-        public int SaveChanges()
-        {
-            return _context.SaveChanges();
-        }
+         //public async Task<int> SaveChangesAsync()
+         //{
+         //    return await _context.SaveChangesAsync();
+         //}
     }
 }
